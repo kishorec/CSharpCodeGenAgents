@@ -4,6 +4,8 @@
     {
         public static async Task<string> GenerateAsync(string code, string errors)
         {
+            Console.WriteLine("'FixCode' agent is building the prompt for the task...");
+
             string prompt = $@"
                 The following C# code failed. Here is the code:
                 {code}

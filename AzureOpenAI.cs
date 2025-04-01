@@ -2,6 +2,7 @@
 using Azure.AI.OpenAI;
 using OpenAI.Chat;
 using System.Configuration;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using static Azure.AI.OpenAI.AzureOpenAIClientOptions;
@@ -13,6 +14,7 @@ namespace Microsoft.AzureDataEngineering.AI
         public static async Task<string> AskAzureAsync(string prompt)
         {
             Console.WriteLine("Asking Azure OpenAI...");
+            var stopwatch = Stopwatch.StartNew();
             string endpoint = ConfigurationManager.AppSettings["AZURE_OPENAI_ENDPOINT"] ?? string.Empty;
             string key = ConfigurationManager.AppSettings["AZURE_OPENAI_KEY"] ?? string.Empty;
             string deployment = ConfigurationManager.AppSettings["AZURE_OPENAI_DEPLOYMENT"] ?? string.Empty;
@@ -70,7 +72,10 @@ namespace Microsoft.AzureDataEngineering.AI
                 throw new Exception("Azure OpenAI API call failed.");
             }
 
-            return ParseOpenAIResponse(json);
+            String result = ParseOpenAIResponse(json);
+            stopwatch.Stop();
+            Console.WriteLine($"Time taken by Azure OpenAI: {stopwatch.ElapsedMilliseconds} ms");
+            return result;
         }
 
         static string ParseOpenAIResponse(string json)

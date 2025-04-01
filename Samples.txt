@@ -1,3 +1,148 @@
+============ Well Known Computer Science Problems ============
+Sorting & Searching:
+Quick Sort – Fast divide-and-conquer sorting algorithm with average-case O(n log n).
+Merge Sort – Stable, recursive sort that always runs in O(n log n).
+Heap Sort – Uses a heap data structure for sorting in O(n log n) without recursion.
+Bubble Sort – Simple but inefficient O(n²) sorting algorithm, great for teaching.
+Binary Search – Efficient O(log n) algorithm to search in a sorted array.
+Interpolation Search – Improved binary search that works best with uniformly distributed data.
+
+Greedy Algorithms:
+Dijkstra’s Algorithm – Finds the shortest path in a graph with non-negative weights.
+Prim’s Algorithm – Builds a minimum spanning tree from a weighted graph.
+Kruskal’s Algorithm – Constructs a minimum spanning tree using union-find.
+Huffman Coding – Builds optimal prefix codes for compression.
+
+Dynamic Programming:
+Knapsack Algorithm – Solves the 0/1 knapsack problem using DP.
+Floyd-Warshall Algorithm – Computes shortest paths between all pairs of nodes.
+Longest Common Subsequence (LCS) – Finds the longest subsequence common to two sequences.
+Edit Distance / Levenshtein Distance – Measures similarity between strings.
+Matrix Chain Multiplication – Finds optimal way to parenthesize matrix product.
+Bellman-Ford Algorithm – Finds shortest path with negative weights (slower than Dijkstra).
+
+Divide and Conquer:
+Karatsuba Multiplication – Faster multiplication of large integers.
+Strassen’s Algorithm – Improves matrix multiplication to below O(n³).
+Fast Fourier Transform (FFT) – Used for signal processing and polynomial multiplication.
+Closest Pair of Points – Solves a geometric problem in O(n log n) time.
+
+Graph Algorithms:
+Depth-First Search (DFS) – Explores as far as possible along each branch.
+Breadth-First Search (BFS) – Explores all neighbors level-by-level.
+Topological Sort – Orders DAG nodes such that for every directed edge (u, v), u comes before v.
+Tarjan’s Algorithm – Finds strongly connected components in a graph.
+Union-Find (Disjoint Set Union) – Supports efficient merging and finding of disjoint sets.
+
+AI / Machine Learning Foundations:
+Gradient Descent – Optimizes functions by taking steps proportional to the gradient.
+Backpropagation – Computes gradients in neural networks.
+K-Means Clustering – Partitions data into k clusters based on feature similarity.
+Minimax Algorithm – Decision-making algorithm in two-player games (like chess).
+A Search Algorithm* – Heuristic-based pathfinding algorithm (like Dijkstra but with a goal bias).
+
+Others:
+PageRank – Google's famous algorithm for ranking web pages.
+RSA Algorithm – Foundation of public-key cryptography.
+
+
+============ Well Known Mathematics Problems ============
+Linear Algebra & Systems of Equations:
+Solving Linear Systems (Ax = b) – Using methods like Gaussian elimination, LU decomposition, or iterative solvers (e.g. Jacobi, Gauss-Seidel).
+Matrix Inversion – Computing the inverse of a matrix, often via LU or QR decomposition.
+Eigenvalue/Eigenvector Computation – Used in PCA, physics, and engineering (solved using power iteration or QR algorithms).
+Singular Value Decomposition (SVD) – Decomposes a matrix, useful in signal processing, data compression, and machine learning.
+Least Squares Approximation – Fits a model to data by minimizing the sum of squared residuals.
+
+Optimization Problems:
+Linear Programming (LP) – Optimizes a linear objective under linear constraints (solved using the Simplex or Interior Point method).
+Quadratic Programming – Like LP but with a quadratic objective function.
+Integer Programming – Optimization with integer constraints, solved via branch and bound or cutting planes.
+Convex Optimization – Efficient algorithms exist (e.g. gradient descent, Newton’s method).
+Nonlinear Optimization – Includes global and local search methods, used in engineering, ML, and finance.
+
+Number Theory & Cryptography:
+Primality Testing – Efficient probabilistic algorithms like Miller-Rabin or deterministic ones like AKS.
+Integer Factorization – Basis for RSA encryption. Algorithms include Pollard’s rho and Quadratic Sieve.
+Greatest Common Divisor (GCD) – Solved via Euclidean algorithm, even for large numbers.
+Modular Exponentiation – Crucial for cryptography, efficiently solved via exponentiation by squaring.
+Discrete Logarithm – Solved using baby-step giant-step or Pollard’s rho for discrete log (used in Diffie-Hellman).
+
+Calculus & Analysis:
+Numerical Integration – Approximate definite integrals using trapezoidal rule, Simpson’s rule, or adaptive quadrature.
+Numerical Differentiation – Approximate derivatives using finite differences.
+Solving Nonlinear Equations – Use methods like Newton-Raphson, Bisection, or Secant.
+Root Finding for Polynomials – Techniques include Durand-Kerner or Bairstow's method.
+Differential Equations (ODEs/PDEs) – Solved numerically using Euler's method, Runge-Kutta, or finite difference/element methods.
+
+Geometry & Topology:
+Convex Hull – Find the smallest convex polygon enclosing a set of points (Graham scan, QuickHull).
+Computational Geometry (e.g. intersection, triangulation) – Crucial in graphics, robotics, and GIS.
+Voronoi Diagrams / Delaunay Triangulation – Used in spatial analysis, game development, and physics.
+Ray Tracing / Collision Detection – Key in rendering and physics simulations.
+Topology Optimization – Used in engineering to find the best material layout within a given design space.
+
+Graph-Based & Network Problems:
+Shortest Path in Weighted Graphs – Dijkstra, A*, Bellman-Ford.
+Max Flow / Min Cut Problems – Solved using Ford-Fulkerson, Edmonds-Karp, or Push-Relabel.
+Traveling Salesman Problem (TSP) – NP-hard, solved via dynamic programming, branch and bound, or heuristics (e.g. simulated annealing, genetic algorithms).
+Graph Coloring / Scheduling – Used in compiler optimization and resource allocation.
+PageRank / Centrality Measures – Eigenvector-based ranking of nodes in a graph.
+
+Symbolic Computation (CAS):
+Symbolic Integration and Differentiation – Done using pattern matching and algebraic manipulation (e.g. by Mathematica, SymPy).
+Equation Simplification & Factoring – Reducing complex expressions programmatically.
+Solving Algebraic Equations – Roots of symbolic polynomials or systems.
+
+============ Well Known Distributed Systems Problems ============
+Consensus & Fault Tolerance:
+Paxos – A fundamental consensus algorithm ensuring agreement in a distributed system despite partial failures.
+Raft – A leader-based consensus algorithm that’s easier to understand and implement than Paxos; used in etcd, Consul.
+Viewstamped Replication (VSR) – An alternative to Paxos focused on replicated state machines.
+Zab (Zookeeper Atomic Broadcast) – Used in Apache Zookeeper for leader election and synchronization.
+Byzantine Fault Tolerance (BFT) – Ensures system correctness even with malicious or arbitrary faults.
+Practical Byzantine Fault Tolerance (PBFT) – A performant, real-world version of BFT.
+VRR (Virtual Ring Routing) – Used in virtual ring-based consensus like Chord.
+Multi-Paxos – Optimizes Paxos for multiple proposals over time by reusing leadership.
+EPaxos (Efficient Paxos) – A fast, leaderless, fault-tolerant consensus protocol with high throughput.
+Fast Paxos – Reduces latency in consensus by allowing direct communication with acceptors.
+
+Replication, Recovery & Coordination:
+Chain Replication – Used in scalable distributed storage systems, replicates data through a chain of nodes.
+Quorum-based Replication – Ensures consistency and availability via read/write quorum rules (used in DynamoDB, Cassandra).
+Vector Clocks – Captures partial ordering of events, used in causality tracking and conflict resolution.
+Lamport Timestamps – Logical clocks to order events in distributed systems.
+Snapshot Algorithms (Chandy-Lamport) – Captures global system state without halting system operations.
+Gossip Protocols – Efficiently spread state information across nodes (used in Cassandra, Dynamo).
+Two-Phase Commit (2PC) – Ensures atomicity across distributed databases.
+Three-Phase Commit (3PC) – Improves on 2PC with added fault tolerance.
+Bullying Algorithm – A simple leader election protocol for crash recovery.
+Ring-based Election Algorithm – Used in token-ring systems for leader election.
+
+Scheduling, Sharding, and Load Balancing:
+Consistent Hashing – Balances load across distributed systems and handles node churn gracefully (used in CDNs, caches, etc.).
+Fair Scheduling (DRF, Dominant Resource Fairness) – Used in multi-tenant cluster schedulers like Apache Mesos and Kubernetes.
+MapReduce Execution Model – Optimized data-parallel algorithm for distributed computation.
+Work Stealing – Load balancing technique for task scheduling in distributed or multicore systems.
+Power of Two Choices (Load Balancing) – Selects the least loaded among two randomly chosen nodes, significantly reducing imbalance.
+
+Routing, Clustering & Synchronization:
+Chord DHT (Distributed Hash Table) – A scalable peer-to-peer lookup protocol using consistent hashing.
+Kademlia – Another DHT used in BitTorrent and Ethereum, known for XOR-based routing and redundancy.
+Leader Election via ZooKeeper – Coordination strategy in distributed applications using ephemeral nodes.
+Barrier Synchronization – Ensures all nodes reach a certain point before continuing, used in MPI and parallel algorithms.
+Spanner’s TrueTime API – Google’s globally-distributed system clock that provides bounded time uncertainty for linearizable transactions.
+
+Widely Used in Practice:
+RAFT (used by etcd, HashiCorp Consul)
+Gossip (used by Cassandra, Akka)
+Quorum (used by DynamoDB, MongoDB, ZooKeeper)
+Paxos (used by Chubby, Spanner)
+PBFT (used in Tendermint, Hyperledger)
+
+
+============ More Computer Science Problems ============
+
 Write consistent hashing implementation that can be used in distributed systems.
 Implement a Key-Value store that uses local file system to persist the information. It shoud use a log file pattern for storing the information instead of keeping every transaction in a separate file
 Write a cache implemenation that uses most recently used policy for evictions

@@ -4,6 +4,7 @@
     {
         public static async Task<string> GenerateAsync(string task)
         {
+            Console.WriteLine("'CodeGen' agent is building the prompt for the task...");
             string prompt = $@"
                 You are an expert software developer. Write clean C# code to solve the following problem:
                 {task}

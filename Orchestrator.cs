@@ -5,29 +5,26 @@ namespace Microsoft.AzureDataEngineering.AI
     class Orchestrator
     {
         static readonly string ProjectDir = Path.Combine(Environment.CurrentDirectory, "generated");
-        static readonly  string DesignDocFile = ProjectDir + "/DesignDocument.md";
-        static readonly  string DesignDocHtmlFile = ProjectDir + "/DesignDocument.html";
-        static readonly  string CsProjDir = ProjectDir + "/CSProject";
-        static readonly  string TestProjDir = ProjectDir + "/TestProject";
-        static readonly  int MaxRetries = 10;
+        static readonly string DesignDocFile = ProjectDir + "/DesignDocument.md";
+        static readonly string DesignDocHtmlFile = ProjectDir + "/DesignDocument.html";
+        static readonly string CsProjDir = ProjectDir + "/CSProject";
+        static readonly string TestProjDir = ProjectDir + "/TestProject";
+        static readonly int MaxRetries = 10;
 
         static async Task Main()
         {
-            SetupProjects();
+            if (!Directory.Exists(ProjectDir))
+            {
+                SetupProjects();
+            }
 
             while (true)
             {
-                Console.Write("\nEnter your C# task (e.g., 'Reverse a string'):\n> ");
-                string taskDescription = Console.ReadLine() ?? String.Empty;
-                if (String.IsNullOrEmpty(taskDescription))
-                {
-                    continue;
-                }
+                Console.Write("\nI’m an intelligent C# code generation agent—designed to write, test, and document clean code for your requests.\nWhat would you like me to build? (e.g., 'Reverse a string')\n> ");
 
-                if (taskDescription.Equals("exit", StringComparison.OrdinalIgnoreCase))
-                {
-                    break;
-                }
+                string taskDescription = Console.ReadLine()?.Trim() ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(taskDescription)) continue;
+                if (taskDescription.Equals("exit", StringComparison.OrdinalIgnoreCase)) break;
 
                 try
                 {
@@ -37,75 +34,79 @@ namespace Microsoft.AzureDataEngineering.AI
                     bool success = false;
                     for (int attempt = 0; attempt < MaxRetries; attempt++)
                     {
-                        Console.WriteLine($"Validating generated code. Attempt {attempt + 1} of {MaxRetries}");
-                        Console.WriteLine("Starting test suite generation...");
+                        Console.WriteLine($"\nAttempt {attempt + 1} of {MaxRetries} — Validating generated code...");
+
+                        Console.WriteLine("Generating test suite...");
                         string tests = await GenTestSuiteAgent.GenerateAsync(code);
 
-                        Console.WriteLine("Adding generated files to the VS project and solution files...");
-                        File.WriteAllText(Path.Combine(CsProjDir, "Solution.cs"), code);
-                        File.WriteAllText(Path.Combine(TestProjDir, "Tests.cs"), tests);
+                        try
+                        {
+                            File.WriteAllText(Path.Combine(CsProjDir, "Solution.cs"), code);
+                            File.WriteAllText(Path.Combine(TestProjDir, "Tests.cs"), tests);
+                        }
+                        catch (IOException ioEx)
+                        {
+                            Console.WriteLine("Failed to write generated files: " + ioEx.Message);
+                            break;
+                        }
 
                         Console.WriteLine("Building the solution...");
                         if (!BuildProject(CsProjDir, out string buildErrors))
                         {
-                            Console.WriteLine("!!! Build failed. Attempting to fix...");
+                            Console.WriteLine("Build failed. Attempting to fix...");
                             Console.WriteLine(buildErrors);
                             code = await FixCodeAgent.GenerateAsync(code, buildErrors);
                             continue;
                         }
 
-                        Console.WriteLine("Running the tests...");
+                        Console.WriteLine("Running tests...");
                         if (RunTests(TestProjDir, out string testErrors))
                         {
                             Console.WriteLine("All tests passed!");
                             Console.WriteLine("Generating design document...");
+
                             string designDoc = await GenDocAgent.GenerateAsync(code);
                             File.WriteAllText(DesignDocFile, designDoc);
-                            File.WriteAllText(DesignDocHtmlFile, Utils.MarkdownToHtml(designDoc));
-                            Console.WriteLine($"Design document saved. File: {DesignDocHtmlFile}");
+                            File.WriteAllText(DesignDocHtmlFile, MarkdownToHtml(designDoc));
+
+                            Console.WriteLine($"Design document saved: {DesignDocHtmlFile}");
+                            Console.WriteLine($"Successfully completed: {taskDescription}");
 
                             success = true;
                             break;
                         }
                         else
                         {
-                            Console.WriteLine("\n!!! Tests failed with following errors. Attempting to fix...");
-                            Console.WriteLine();
+                            Console.WriteLine("Tests failed. Attempting to fix...");
                             Console.WriteLine(testErrors);
                             code = await FixCodeAgent.GenerateAsync(code, testErrors);
-                            Thread.Sleep(1);
-                            continue;
+                            await Task.Delay(200);
                         }
                     }
 
                     if (!success)
                     {
-                        Console.WriteLine($"\nMaximum retries reached. Unable to produce working code for Task={taskDescription}");
+                        Console.WriteLine($"\nMaximum retries reached. Unable to complete: {taskDescription}");
+                        File.WriteAllText(Path.Combine(ProjectDir, "Failed_" + SanitizeFilename(taskDescription) + ".cs"), code);
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine($"\nFailed to produce working code for Task={taskDescription}");
+                    Console.WriteLine("Exception occurred: " + e.Message);
+                    Console.WriteLine($"Failed to complete task: {taskDescription}");
                 }
-
             }
+        }
+
+        static string SanitizeFilename(string input)
+        {
+            foreach (char c in Path.GetInvalidFileNameChars())
+                input = input.Replace(c, '_');
+            return input;
         }
 
         static void SetupProjects()
         {
-            try
-            {
-                //if (Directory.Exists(ProjectDir))
-                //{
-                //    Directory.Delete(ProjectDir, true);
-                //}
-            }
-            catch (Exception)
-            {
-                //Ignore exception
-            }
-
             Directory.CreateDirectory(ProjectDir);
             Utils.Run("dotnet", "new web -o " + CsProjDir);
             Utils.Run("dotnet", "new nunit -o " + TestProjDir);
@@ -127,10 +128,11 @@ namespace Microsoft.AzureDataEngineering.AI
 
         static bool Run(string dir, string command, out string errorOutput)
         {
-            errorOutput = String.Empty;
+            errorOutput = string.Empty;
             StringBuilder? outputMessage = null;
             StringBuilder? errorMessage = null;
             var process = Utils.RunIn(dir, command, out errorMessage, out outputMessage);
+
             if (errorMessage != null)
             {
                 errorOutput = errorMessage.ToString();
@@ -139,7 +141,13 @@ namespace Microsoft.AzureDataEngineering.AI
             {
                 errorOutput = outputMessage.ToString();
             }
+
             return process.ExitCode == 0;
+        }
+
+        static string MarkdownToHtml(string md)
+        {
+            return $"<html><head><meta charset='utf-8'><title>Design Doc</title></head><body><pre>{md}</pre></body></html>";
         }
 
     }

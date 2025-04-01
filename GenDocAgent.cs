@@ -4,6 +4,7 @@
     {
         public static async Task<string> GenerateAsync(string code)
         {
+            Console.WriteLine("'DocumentGen' agent is building the prompt for the task...");
             string prompt = $@"
                 Write a professional design document based on the following C# code:
                 {code}

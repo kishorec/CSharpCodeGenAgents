@@ -4,6 +4,7 @@
     {
         public static async Task<string> GenerateAsync(string code)
         {
+            Console.WriteLine("'TestSuiteGen' agent is building the prompt for the task...");
             string prompt = $@"
                  You are an expert software developer. Write NUnit unit tests for the following C# class and method:
                 {code}

@@ -6,11 +6,6 @@ namespace Microsoft.AzureDataEngineering.AI
 {
     class Utils
     {
-        public static string MarkdownToHtml(string md)
-        {
-            return $"<html><head><meta charset='utf-8'><title>Design Doc</title></head><body><pre>{md}</pre></body></html>";
-        }
-
         public static Process RunIn(string dir, string command)
         {
             return RunIn(dir, command, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder);
@@ -19,21 +14,18 @@ namespace Microsoft.AzureDataEngineering.AI
         public static Process RunIn(string dir, string command, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder)
         {
             string[] parts = command.Split(' ', 2);
-            var process = new Process
+            var startInfo = new ProcessStartInfo
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = parts[0],
-                    Arguments = parts.Length > 1 ? parts[1] : "",
-                    WorkingDirectory = dir,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
+                FileName = parts[0],
+                Arguments = parts.Length > 1 ? parts[1] : "",
+                WorkingDirectory = dir,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
             };
 
-            return RunProcess(process, out errorBuilder, out outputBuilder);
+            return RunProcess(startInfo, out errorBuilder, out outputBuilder);
         }
 
         public static Process Run(string command, string args)
@@ -43,61 +35,80 @@ namespace Microsoft.AzureDataEngineering.AI
 
         public static Process Run(string command, string args, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder)
         {
-            var process = new Process
+            var startInfo = new ProcessStartInfo
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = command,
-                    Arguments = args,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
+                FileName = command,
+                Arguments = args,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
             };
 
-            return RunProcess(process, out errorBuilder, out outputBuilder);
+            return RunProcess(startInfo, out errorBuilder, out outputBuilder);
         }
 
-        private static Process RunProcess(Process process, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder)
+        private static Process RunProcess(ProcessStartInfo startInfo, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder)
         {
             errorBuilder = null;
             outputBuilder = null;
-            var tempOutputBuilder = new StringBuilder();
-            var tempErrorBuilder = new StringBuilder();
 
-            process.OutputDataReceived += (sender, e) =>
+            int maxRetries = int.Parse(ConfigurationManager.AppSettings["RUN_PROCESS_MAX_RETRIES"] ?? "3");
+            int timeoutSeconds = int.Parse(ConfigurationManager.AppSettings["RUN_PROCESS_TIMEOUT_INTERVAL_SECS"] ?? "60");
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
             {
-                if (e.Data != null) tempOutputBuilder.AppendLine(e.Data);
-            };
+                var process = new Process();
+                process.StartInfo = startInfo;
 
-            process.ErrorDataReceived += (sender, e) =>
-            {
-                if (e.Data != null) tempErrorBuilder.AppendLine(e.Data);
-            };
+                var tempOutputBuilder = new StringBuilder();
+                var tempErrorBuilder = new StringBuilder();
 
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+                process.OutputDataReceived += (sender, e) =>
+                {
+                    if (e.Data != null) tempOutputBuilder.AppendLine(e.Data);
+                };
 
-            int timeoutSeconds = Int32.Parse(ConfigurationManager.AppSettings["BUILD_AND_TEST_TIMEOUT_INTERVAL_SECS"] ?? "60");
-            if (!process.WaitForExit(TimeSpan.FromSeconds(timeoutSeconds)))
-            {
-                process.Kill(true);
-                throw new TimeoutException($"Process '{process.StartInfo.FileName} {process.StartInfo.Arguments}' timed out.");
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (e.Data != null) tempErrorBuilder.AppendLine(e.Data);
+                };
+
+                try
+                {
+                    process.Start();
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+
+                    if (!process.WaitForExit(TimeSpan.FromSeconds(timeoutSeconds)))
+                    {
+                        process.Kill(true);
+                        throw new TimeoutException($"Process '{process.StartInfo.FileName} {process.StartInfo.Arguments}' timed out on attempt {attempt}.");
+                    }
+
+                    process.WaitForExit(); // Ensure output is flushed
+
+                    errorBuilder = tempErrorBuilder.Length > 0 ? tempErrorBuilder : null;
+                    outputBuilder = tempOutputBuilder.Length > 0 ? tempOutputBuilder : null;
+
+                    return process; //success
+                }
+                catch (TimeoutException ex)
+                {
+                    Console.WriteLine($"Timeout on attempt {attempt}: {ex.Message}");
+
+                    if (attempt == maxRetries)
+                    {
+                        Console.WriteLine("Max retries reached. Failing...");
+                        throw;
+                    }
+
+                    // Optional: delay between retries
+                    Thread.Sleep(1000);
+                }
             }
 
-            process.WaitForExit(); // Ensure output handlers are finished
-
-            if (tempErrorBuilder.Length > 0)
-            {
-                errorBuilder = tempErrorBuilder;
-            }
-            if (tempOutputBuilder.Length > 0)
-            {
-                outputBuilder = tempOutputBuilder;
-            }
-            return process;
+            throw new Exception($"Unexpected failure while running process for {startInfo.ToString}");
         }
     }
 }
