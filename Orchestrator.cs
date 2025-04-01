@@ -87,7 +87,6 @@ namespace Microsoft.AzureDataEngineering.AI
                     if (!success)
                     {
                         Console.WriteLine($"\nMaximum retries reached. Unable to complete: {taskDescription}");
-                        File.WriteAllText(Path.Combine(ProjectDir, "Failed_" + SanitizeFilename(taskDescription) + ".cs"), code);
                     }
                 }
                 catch (Exception e)
@@ -98,12 +97,6 @@ namespace Microsoft.AzureDataEngineering.AI
             }
         }
 
-        static string SanitizeFilename(string input)
-        {
-            foreach (char c in Path.GetInvalidFileNameChars())
-                input = input.Replace(c, '_');
-            return input;
-        }
 
         static void SetupProjects()
         {
