@@ -1,0 +1,14 @@
+Write consistent hashing implementation that can be used in distributed systems.
+Implement a Key-Value store that uses local file system to persist the information. It shoud use a log file pattern for storing the information instead of keeping every transaction in a separate file
+Write a cache implemenation that uses most recently used policy for evictions
+Write a gossip protocol implementation that can be used in real world distributed systems
+Write a simple JSON parser to parse Delta Lake JSON Log files and create a Snapshot class that contains protocol, metadata, deletion vector, addfiles and remove files
+Write a scientific calculator
+Write an complete implementation of Capacity scheduler similar to the one used in Apache YARN
+Write binary search tree with inorder, preorder and post order traversal without recursion
+Write a complete implementation of a pool that can be used to pool cluster instances. The pool should have a min and max. When an object is taken out of the pool, we should trigger the process for creating a cluster and adding it to the pool. Cluster is a collection of nodes. The cluster node SKU type and node size can be used together as the key to identify the pool 
+Write hinted handoff implementation described in dynamo paper for handling failures
+
+Example to show build/test case failures:
+Implement ADO.NET driver for windows file system
+Write an asp.net service that proides apis for scientific calculator
