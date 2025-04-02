@@ -13,6 +13,11 @@ namespace Microsoft.AzureDataEngineering.AI
 
         public static Process RunIn(string dir, string command, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder)
         {
+            return RunIn(dir, command, out errorBuilder, out outputBuilder, false);
+        }
+
+        public static Process RunIn(string dir, string command, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder, bool throwOnError)
+        {
             string[] parts = command.Split(' ', 2);
             var startInfo = new ProcessStartInfo
             {
@@ -25,15 +30,20 @@ namespace Microsoft.AzureDataEngineering.AI
                 CreateNoWindow = true
             };
 
-            return RunProcess(startInfo, out errorBuilder, out outputBuilder);
+            return RunProcess(startInfo, out errorBuilder, out outputBuilder, throwOnError);
         }
 
         public static Process Run(string command, string args)
         {
-            return Run(command, args, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder);
+            return Run(command, args, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder, false);
         }
 
-        public static Process Run(string command, string args, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder)
+        public static Process Run(string command, string args, bool throwOnError)
+        {
+            return Run(command, args, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder, throwOnError);
+        }
+
+        public static Process Run(string command, string args, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder, bool throwOnError)
         {
             var startInfo = new ProcessStartInfo
             {
@@ -45,15 +55,15 @@ namespace Microsoft.AzureDataEngineering.AI
                 CreateNoWindow = true
             };
 
-            return RunProcess(startInfo, out errorBuilder, out outputBuilder);
+            return RunProcess(startInfo, out errorBuilder, out outputBuilder, throwOnError);
         }
 
-        private static Process RunProcess(ProcessStartInfo startInfo, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder)
+        private static Process RunProcess(ProcessStartInfo startInfo, out StringBuilder? errorBuilder, out StringBuilder? outputBuilder, bool throwOnError)
         {
             errorBuilder = null;
             outputBuilder = null;
 
-            int maxRetries = int.Parse(ConfigurationManager.AppSettings["RUN_PROCESS_MAX_RETRIES"] ?? "3");
+            int maxRetries = int.Parse(ConfigurationManager.AppSettings["RUN_PROCESS_MAX_RETRIES"] ?? "1");
             int timeoutSeconds = int.Parse(ConfigurationManager.AppSettings["RUN_PROCESS_TIMEOUT_INTERVAL_SECS"] ?? "60");
 
             for (int attempt = 1; attempt <= maxRetries; attempt++)
@@ -90,6 +100,11 @@ namespace Microsoft.AzureDataEngineering.AI
 
                     errorBuilder = tempErrorBuilder.Length > 0 ? tempErrorBuilder : null;
                     outputBuilder = tempOutputBuilder.Length > 0 ? tempOutputBuilder : null;
+
+                    if (process.ExitCode != 0 && throwOnError)
+                    {
+                        throw new Exception($"Process '{process.StartInfo.FileName} {process.StartInfo.Arguments}' failed with exit code {process.ExitCode} on attempt {attempt}.");
+                    }   
 
                     return process; //success
                 }

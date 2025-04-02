@@ -29,6 +29,8 @@ namespace Microsoft.AzureDataEngineering.AI
             var body = new
             {
                 messages = new[] { new { role = "user", content = prompt } },
+                
+                //max_tokens = 10000, //Works for GPT4
                 max_completion_tokens = 10000,
                 model = deployment
             };

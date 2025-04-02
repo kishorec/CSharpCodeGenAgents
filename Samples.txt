@@ -157,3 +157,14 @@ Write hinted handoff implementation described in dynamo paper for handling failu
 Example to show build/test case failures:
 Implement ADO.NET driver for windows file system
 Write an asp.net service that proides apis for scientific calculator
+
+============ For Demos ============
+Write a scientific calculator class
+Quick Sort – Fast divide-and-conquer sorting algorithm with average-case O(n log n).
+Dijkstra’s Algorithm – Finds the shortest path in a graph with non-negative weights.
+Knapsack Algorithm – Solves the 0/1 knapsack problem using DP.
+Write consistent hashing implementation that can be used in distributed systems.
+Write a cache implemenation that uses most recently used policy for evictions
+Shortest Path in Weighted Graphs – Dijkstra, A*, Bellman-Ford.
+K-Means Clustering – Partitions data into k clusters based on feature similarity.
+

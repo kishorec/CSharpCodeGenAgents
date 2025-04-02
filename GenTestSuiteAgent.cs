@@ -11,6 +11,8 @@
 
                  Requirements:
                 - Include [TestFixture] and [Test] attributes
+                - Do not write test cases for windows.forms user interface classes
+                - Use package name 'Microsoft.AzureDataEngineering.AI' for all classes
                 - Add at least 20 unit test cases
                 - Include test for catching edge cases
                 - Include fuzz testing for the APIs using every possible input

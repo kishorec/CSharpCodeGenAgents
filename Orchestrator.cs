@@ -10,17 +10,20 @@ namespace Microsoft.AzureDataEngineering.AI
         static readonly string CsProjDir = ProjectDir + "/CSProject";
         static readonly string TestProjDir = ProjectDir + "/TestProject";
         static readonly int MaxRetries = 10;
+        static readonly bool SupportWindowsUI = true;
 
         static async Task Main()
         {
-            if (!Directory.Exists(ProjectDir))
-            {
-                SetupProjects();
-            }
+            await RunOrchestrator();
+        }
+
+        static async Task RunOrchestrator()
+        { 
+            CleanupProjects();
 
             while (true)
             {
-                Console.Write("\nI’m an intelligent C# code generation agent—designed to write, test, and document clean code for your requests.\nWhat would you like me to build? (e.g., 'Reverse a string')\n> ");
+                Console.WriteLine("\nI’m an intelligent C# code generation agent—designed to write, test, and document clean code for your requests.\nWhat would you like me to build? (e.g., 'Reverse a string')\n> ");
 
                 string taskDescription = Console.ReadLine()?.Trim() ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(taskDescription)) continue;
@@ -28,6 +31,8 @@ namespace Microsoft.AzureDataEngineering.AI
 
                 try
                 {
+                    SetupProjects();
+
                     Console.WriteLine("\nStarting code generation...");
                     string code = await GenCodeAgent.GenerateAsync(taskDescription);
 
@@ -97,16 +102,51 @@ namespace Microsoft.AzureDataEngineering.AI
             }
         }
 
-
         static void SetupProjects()
         {
             Directory.CreateDirectory(ProjectDir);
-            Utils.Run("dotnet", "new web -o " + CsProjDir);
-            Utils.Run("dotnet", "new nunit -o " + TestProjDir);
+            if (SupportWindowsUI)
+            {
+                Utils.Run("dotnet", $"new winforms -o {CsProjDir} --framework net8.0");
+                Utils.Run("dotnet", $"new nunit -o {TestProjDir} --framework net8.0");
+
+                string testProjPath = Path.Combine(TestProjDir, "TestProject.csproj");
+                if (File.Exists(testProjPath))
+                {
+                    string csproj = File.ReadAllText(testProjPath);
+
+                    if (csproj.Contains("<TargetFramework>net8.0</TargetFramework>") && !csproj.Contains("-windows"))
+                    {
+                        csproj = csproj.Replace("<TargetFramework>net8.0</TargetFramework>",
+                            "<TargetFramework>net8.0-windows</TargetFramework>\n  <UseWindowsForms>true</UseWindowsForms>");
+                        File.WriteAllText(testProjPath, csproj);
+                    }
+                }
+            }
+            else
+            {
+                Utils.Run("dotnet", "new web -o " + CsProjDir);
+                Utils.Run("dotnet", "new nunit -o " + TestProjDir);
+            }
             Utils.RunIn(TestProjDir, "dotnet add reference ../CSProject/CSProject.csproj");
             Utils.RunIn(ProjectDir, "dotnet new sln -n AIProjects");
             Utils.RunIn(ProjectDir, "dotnet sln add CSProject/CSProject.csproj");
             Utils.RunIn(ProjectDir, "dotnet sln add TestProject/TestProject.csproj");
+        }
+
+        static void CleanupProjects()
+        {
+            if (Directory.Exists(ProjectDir))
+            {
+                try
+                {
+                    Directory.Delete(ProjectDir, true);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Failed to delete output directory.");
+                }
+            }
         }
 
         static bool BuildProject(string projectDir, out string errorOutput)
@@ -122,6 +162,7 @@ namespace Microsoft.AzureDataEngineering.AI
         static bool Run(string dir, string command, out string errorOutput)
         {
             errorOutput = string.Empty;
+
             StringBuilder? outputMessage = null;
             StringBuilder? errorMessage = null;
             var process = Utils.RunIn(dir, command, out errorMessage, out outputMessage);
@@ -136,6 +177,7 @@ namespace Microsoft.AzureDataEngineering.AI
             }
 
             return process.ExitCode == 0;
+
         }
 
         static string MarkdownToHtml(string md)
