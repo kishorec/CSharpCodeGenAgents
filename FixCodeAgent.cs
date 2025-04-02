@@ -19,25 +19,33 @@
                 Fix the code so that it compiles successfully and passes **all unit tests**.
 
                 Requirements:
-                - Wrap the corrected method in a public static class named 'Solution'
-                - Ensure the entry method is public static and named 'Solve'
-                - Ensure the test project can locate and reference the 'Solution' class
+                - Write clean, correct, and idiomatic C# code targeting .NET 6 or higher
+                - All code must be valid and compile without modification
+
+                Structure:
+                - Place the core logic in a public static class named 'Solution'
+                - Add an entry Main() method in the Solution class to demonstrate the functionality
                 - If UI elements are present, separate them from business logic
-                - Namespace must be: Microsoft.AzureDataEngineering.AI
+                - Use the namespace: Microsoft.AzureData.Engineering.AI
                 - Include all necessary `using` directives at the top
-                - The solution must compile under .NET 6 or higher
+                - Ensure the test project can locate and reference the 'Solution' class
+
+                Guidelines:
                 - Use async/await for any asynchronous logic
                 - Prefer generic types in method signatures wherever appropriate
-
-                Code Quality:
-                - Use only standard C# libraries (no external frameworks or NuGet packages)
-                - Avoid redundant logic, optimize for performance and readability
-                - Add `//` comments only where needed to clarify fixes or logic
-                - Do not include natural language explanations, markdown, or pseudocode
                 - Output only valid, compilable C# source code
+                - Use standard C# libraries only (no external NuGet packages)
+                - Avoid redundant logic
+                - Write code with readability, performance, and maintainability in mind
+                - Do not include natural language explanations, markdown, or pseudocode
+                - Only include comments using `//` when necessary to clarify the code
 
                 Output:
-                - One corrected code file that builds successfully and passes all associated NUnit tests
+                - One corrected code that builds successfully and passes all associated NUnit tests
+
+                Do not:
+                - Include any text outside the code block
+                - Output pseudocode, logs, or placeholders
                 ";
 
             return await AzureOpenAI.AskAzureAsync(prompt);

@@ -17,17 +17,19 @@
 
                 Structure:
                 - Place the core logic in a public static class named 'Solution'
-                - The entry method must be public static and named 'Solve'
-                - If user interaction is required, isolate it in a separate class (e.g., 'ConsoleUI')
-                - Use the namespace: Microsoft.AzureDataEngineering.AI
-                - Add all necessary `using` directives at the top of the file
+                - Add an entry Main() method in the Solution class to demonstrate the functionality
+                - If UI elements are present, separate them from business logic
+                - Use the namespace: Microsoft.AzureData.Engineering.AI
+                - Include all necessary `using` directives at the top
 
                 Guidelines:
-                - Use generic types where appropriate in method signatures
-                - Prefer async/await for asynchronous operations
+                - Use async/await for any asynchronous logic
+                - Prefer generic types in method signatures wherever appropriate
+                - Output only valid, compilable C# source code
                 - Use standard C# libraries only (no external NuGet packages)
+                - Avoid redundant logic
                 - Write code with readability, performance, and maintainability in mind
-                - Do not include any explanation, markdown, or natural language text
+                - Do not include natural language explanations, markdown, or pseudocode
                 - Only include comments using `//` when necessary to clarify the code
 
                 Do not:

@@ -14,7 +14,7 @@
                 - Use [TestFixture] for the test class
                 - Use [Test] for each test method
                 - Add 'using NUnit.Framework;' at the top
-                - Use namespace: Microsoft.AzureDataEngineering.AI
+                - Use namespace: Microsoft.AzureData.Engineering.AI
                 - Do not include tests for any Windows Forms or UI classes
 
                 Coverage Expectations:
