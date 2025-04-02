@@ -6,24 +6,37 @@
         {
             Console.WriteLine("'TestSuiteGen' agent is building the prompt for the task...");
             string prompt = $@"
-                 You are an expert software developer. Write NUnit unit tests for the following C# class and method:
+                You are an expert C# developer and test engineer. Your task is to write comprehensive NUnit unit tests for the following C# class and method:
+
                 {code}
 
-                 Requirements:
-                - Include [TestFixture] and [Test] attributes
-                - Do not write test cases for windows.forms user interface classes
-                - Use package name 'Microsoft.AzureDataEngineering.AI' for all classes
-                - Add at least 20 unit test cases
-                - Include test for catching edge cases
-                - Include fuzz testing for the APIs using every possible input
-                - Add multithreaded tests wherever applicable
+                Test Requirements:
+                - Use [TestFixture] for the test class
+                - Use [Test] for each test method
                 - Add 'using NUnit.Framework;' at the top
-                - Print the name of the test case in the beginning of each test method to show which test is running
-                - Use 'Assert.That(actual, Is.EqualTo(expected))' for assertions
-                - Only generate code that is valid C# code and compiles 
-                - Do not add any explanations without comment marker //
-                - Do not use any external libraries or frameworks
-                - Use standard C# libraries only
+                - Use namespace: Microsoft.AzureDataEngineering.AI
+                - Do not include tests for any Windows Forms or UI classes
+
+                Coverage Expectations:
+                - Add **at least 20 unique test cases** for full code coverage
+                - Cover normal cases, boundary values, and extreme edge cases
+                - Include fuzz tests with randomized or unexpected inputs where applicable
+                - Add **multi-threaded test cases** if the logic involves concurrency or shared state
+
+                Test Behavior:
+                - Each test method should begin with a comment or log indicating its name
+                - Use `Assert.That(actual, Is.EqualTo(expected))` for all assertions
+                - Group similar test cases together using meaningful method names
+
+                Output Constraints:
+                - Only output **valid, compilable C# code**
+                - Use only standard C# libraries (no external packages)
+                - Do not include any explanations, markdown, or descriptive text
+                - Add `//` comments only when needed to clarify test intent
+                - Do not generate pseudocode or test stubs — write complete, runnable code
+
+                Output:
+                - One complete C# file containing only NUnit tests following the rules above
                 ";
             return await AzureOpenAI.AskAzureAsync(prompt);
         }

@@ -160,6 +160,7 @@ Write an asp.net service that proides apis for scientific calculator
 
 ============ For Demos ============
 Write a scientific calculator class
+Binary tree inorder, preorder and post order traversal without recursion
 Quick Sort – Fast divide-and-conquer sorting algorithm with average-case O(n log n).
 Dijkstra’s Algorithm – Finds the shortest path in a graph with non-negative weights.
 Knapsack Algorithm – Solves the 0/1 knapsack problem using DP.

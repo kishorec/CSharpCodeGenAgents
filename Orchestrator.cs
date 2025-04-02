@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Configuration;
+using System.Net;
+using System.Text;
 
 namespace Microsoft.AzureDataEngineering.AI
 {
@@ -10,7 +12,6 @@ namespace Microsoft.AzureDataEngineering.AI
         static readonly string CsProjDir = ProjectDir + "/CSProject";
         static readonly string TestProjDir = ProjectDir + "/TestProject";
         static readonly int MaxRetries = 10;
-        static readonly bool SupportWindowsUI = true;
 
         static async Task Main()
         {
@@ -105,10 +106,13 @@ namespace Microsoft.AzureDataEngineering.AI
         static void SetupProjects()
         {
             Directory.CreateDirectory(ProjectDir);
-            if (SupportWindowsUI)
+
+            string appType = ConfigurationManager.AppSettings["APP_TYPE"] ?? "console";
+            Console.WriteLine("System is configured to create Project for App type: " + appType);
+            if (appType.Equals("winforms", StringComparison.OrdinalIgnoreCase))
             {
-                Utils.Run("dotnet", $"new winforms -o {CsProjDir} --framework net8.0");
-                Utils.Run("dotnet", $"new nunit -o {TestProjDir} --framework net8.0");
+                Utils.Run("dotnet", $"new winforms -o {CsProjDir}");
+                Utils.Run("dotnet", $"new nunit -o {TestProjDir}");
 
                 string testProjPath = Path.Combine(TestProjDir, "TestProject.csproj");
                 if (File.Exists(testProjPath))
@@ -123,11 +127,17 @@ namespace Microsoft.AzureDataEngineering.AI
                     }
                 }
             }
-            else
+            else if (appType.Equals("web", StringComparison.OrdinalIgnoreCase))
             {
                 Utils.Run("dotnet", "new web -o " + CsProjDir);
                 Utils.Run("dotnet", "new nunit -o " + TestProjDir);
             }
+            else
+            {
+                Utils.Run("dotnet", "new console -o " + CsProjDir);
+                Utils.Run("dotnet", "new nunit -o " + TestProjDir);
+            }
+
             Utils.RunIn(TestProjDir, "dotnet add reference ../CSProject/CSProject.csproj");
             Utils.RunIn(ProjectDir, "dotnet new sln -n AIProjects");
             Utils.RunIn(ProjectDir, "dotnet sln add CSProject/CSProject.csproj");
