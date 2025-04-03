@@ -19,7 +19,7 @@ namespace Microsoft.AzureDataEngineering.AI
         }
 
         static async Task RunOrchestrator()
-        { 
+        {
             CleanupProjects();
 
             while (true)
@@ -62,31 +62,43 @@ namespace Microsoft.AzureDataEngineering.AI
                             Console.WriteLine("Build failed. Attempting to fix...");
                             Console.WriteLine(buildErrors);
                             code = await FixCodeAgent.GenerateAsync(code, buildErrors);
+                            await Task.Delay(200);
                             continue;
                         }
 
                         Console.WriteLine("Running tests...");
-                        if (RunTests(TestProjDir, out string testErrors))
+                        try
                         {
-                            Console.WriteLine("All tests passed!");
-                            Console.WriteLine("Generating design document...");
+                            if (RunTests(TestProjDir, out string testErrors))
+                            {
+                                Console.WriteLine("All tests passed!");
+                                Console.WriteLine("Generating design document...");
 
-                            string designDoc = await GenDocAgent.GenerateAsync(code);
-                            File.WriteAllText(DesignDocFile, designDoc);
-                            File.WriteAllText(DesignDocHtmlFile, MarkdownToHtml(designDoc));
+                                string designDoc = await GenDocAgent.GenerateAsync(code);
+                                File.WriteAllText(DesignDocFile, designDoc);
+                                File.WriteAllText(DesignDocHtmlFile, MarkdownToHtml(designDoc));
 
-                            Console.WriteLine($"Design document saved: {DesignDocHtmlFile}");
-                            Console.WriteLine($"Successfully completed: {taskDescription}");
+                                Console.WriteLine($"Design document saved: {DesignDocHtmlFile}");
+                                Console.WriteLine($"Successfully completed: {taskDescription}");
 
-                            success = true;
-                            break;
+                                success = true;
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Tests failed. Attempting to fix...");
+                                Console.WriteLine(testErrors);
+                                code = await FixCodeAgent.GenerateAsync(code, testErrors);
+                                await Task.Delay(200);
+                                continue;
+                            }
                         }
-                        else
+                        catch (TimeoutException e)
                         {
-                            Console.WriteLine("Tests failed. Attempting to fix...");
-                            Console.WriteLine(testErrors);
-                            code = await FixCodeAgent.GenerateAsync(code, testErrors);
+                            Console.WriteLine("Tests timed out. Attempting to fix...");
+                            code = await FixCodeAgent.GenerateAsync(code, "Tests did not run because they were hung and timed out. Exception:" + e.Message);
                             await Task.Delay(200);
+                            continue;
                         }
                     }
 
@@ -94,6 +106,7 @@ namespace Microsoft.AzureDataEngineering.AI
                     {
                         Console.WriteLine($"\nMaximum retries reached. Unable to complete: {taskDescription}");
                     }
+
                 }
                 catch (Exception e)
                 {

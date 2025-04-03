@@ -93,7 +93,7 @@ namespace Microsoft.AzureDataEngineering.AI
                     if (!process.WaitForExit(TimeSpan.FromSeconds(timeoutSeconds)))
                     {
                         process.Kill(true);
-                        throw new TimeoutException($"Process '{process.StartInfo.FileName} {process.StartInfo.Arguments}' timed out on attempt {attempt}.");
+                        throw new TimeoutException($"Process '{startInfo.FileName} {startInfo.Arguments}' timed out on attempt {attempt}.");
                     }
 
                     process.WaitForExit(); // Ensure output is flushed
@@ -103,18 +103,18 @@ namespace Microsoft.AzureDataEngineering.AI
 
                     if (process.ExitCode != 0 && throwOnError)
                     {
-                        throw new Exception($"Process '{process.StartInfo.FileName} {process.StartInfo.Arguments}' failed with exit code {process.ExitCode} on attempt {attempt}.");
+                        throw new Exception($"Process '{startInfo.FileName} {startInfo.Arguments}' failed with exit code {process.ExitCode} on attempt {attempt}.");
                     }   
 
                     return process; //success
                 }
                 catch (TimeoutException ex)
                 {
-                    Console.WriteLine($"Timeout on attempt {attempt}: {ex.Message}");
+                    Console.WriteLine($"Timeout running process '{startInfo.FileName} {startInfo.Arguments}' on attempt {attempt}: {ex.Message}");
 
                     if (attempt == maxRetries)
                     {
-                        Console.WriteLine("Max retries reached. Failing...");
+                        Console.WriteLine($"Max retries for running the process '{startInfo.FileName} {startInfo.Arguments}' reached. Throwing TimeoutException...");
                         throw;
                     }
 
@@ -123,7 +123,12 @@ namespace Microsoft.AzureDataEngineering.AI
                 }
             }
 
-            throw new Exception($"Unexpected failure while running process for {startInfo.ToString}");
+            throw new ProcessExecutionFailedException($"Unexpected failure while running process for {startInfo.ToString}");
         }
     }
+
+    public class ProcessExecutionFailedException : Exception
+    {
+        public ProcessExecutionFailedException(string message) : base(message) { }
+    }   
 }
