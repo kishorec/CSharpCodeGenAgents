@@ -70,7 +70,7 @@ namespace Microsoft.AzureDataEngineering.AI
                     {
                         Console.WriteLine("Build failed. Attempting fix...");
                         Console.WriteLine(buildErrors);
-                        code = await FixCodeAgent.GenerateAsync(code, "Build errors", taskDescription);
+                        code = await FixCodeAgent.GenerateAsync(code, buildErrors, taskDescription);
                         await Task.Delay(200);
                         continue;
                     }
@@ -81,7 +81,7 @@ namespace Microsoft.AzureDataEngineering.AI
                     {
                         Console.WriteLine("Tests failed. Attempting fix...");
                         Console.WriteLine(testErrors);
-                        code = await FixCodeAgent.GenerateAsync(code, "Test failures", taskDescription);
+                        code = await FixCodeAgent.GenerateAsync(code, testErrors, taskDescription);
                         await Task.Delay(200);
                         continue;
                     }
@@ -90,7 +90,9 @@ namespace Microsoft.AzureDataEngineering.AI
                         Console.WriteLine("All tests passed!");
                         Console.WriteLine("\nGenerating design document...");
                         await GenerateDesignDocAsync(code);
-                        Console.WriteLine($"\nTask completed: {taskDescription}");
+                        Console.WriteLine($"\nTask completed successfully.");
+                        Console.WriteLine($"Number of attempts: {attempt}");
+                        Console.WriteLine($"Task Descriptino: {taskDescription}");
                         return true;
                     }
                 }
