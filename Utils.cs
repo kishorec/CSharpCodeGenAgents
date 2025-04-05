@@ -181,14 +181,16 @@ namespace Microsoft.AzureDataEngineering.AI
             AZURE_OPENAI_KEY = ConfigurationManager.AppSettings["AZURE_OPENAI_KEY"] ?? string.Empty;
             AZURE_OPENAI_DEPLOYMENT = ConfigurationManager.AppSettings["AZURE_OPENAI_DEPLOYMENT"] ?? string.Empty;
             AZURE_OPENAI_API_VERSION = ConfigurationManager.AppSettings["AZURE_OPENAI_API_VERSION"] ?? "2024-12-01-preview";
-            AZURE_OPENAI_CALL_MAX_RETRIES = Int32.Parse(ConfigurationManager.AppSettings["AZURE_OPENAI_CALL_MAX_RETRIES"] ?? "0");
-            AZURE_OPENAI_CALL_WAIT_INTERVAL_SECS = Int32.Parse(ConfigurationManager.AppSettings["AZURE_OPENAI_CALL_WAIT_INTERVAL_SECS"] ?? "1000");
-            AZURE_OPENAI_MAX_NUMBER_OF_TOKENS = Int32.Parse(ConfigurationManager.AppSettings["AZURE_OPENAI_MAX_NUMBER_OF_TOKENS"] ?? "100000");
+            AZURE_OPENAI_CALL_MAX_RETRIES = int.Parse(ConfigurationManager.AppSettings["AZURE_OPENAI_CALL_MAX_RETRIES"] ?? "0");
+            AZURE_OPENAI_CALL_WAIT_INTERVAL_SECS = int.Parse(ConfigurationManager.AppSettings["AZURE_OPENAI_CALL_WAIT_INTERVAL_SECS"] ?? "1000");
+            AZURE_OPENAI_MAX_NUMBER_OF_TOKENS = int.Parse(ConfigurationManager.AppSettings["AZURE_OPENAI_MAX_NUMBER_OF_TOKENS"] ?? "100000");
             AZURE_OPENAI_MAX_COMPLETION_TOKENS = AZURE_OPENAI_MAX_NUMBER_OF_TOKENS / 3; // 1/3 of the total tokens for response
             AZURE_OPENAI_MAX_PROMPT_TOKENS = (AZURE_OPENAI_MAX_NUMBER_OF_TOKENS * 2) / 3; // 2/3 of the total tokens for prompt
+            
             APP_TYPE = ConfigurationManager.AppSettings["APP_TYPE"] ?? "console";
             RUN_PROCESS_MAX_RETRIES = int.Parse(ConfigurationManager.AppSettings["RUN_PROCESS_MAX_RETRIES"] ?? "1");
             RUN_PROCESS_TIMEOUT_INTERVAL_SECS = int.Parse(ConfigurationManager.AppSettings["RUN_PROCESS_TIMEOUT_INTERVAL_SECS"] ?? "60");
+            MAX_NUMBER_OF_CODEGEN_RETRIES = int.Parse(ConfigurationManager.AppSettings["MAX_NUMBER_OF_CODEGEN_RETRIES"] ?? "10");
             NUMBER_OF_CHARS_PER_TOKEN = 4; // Approximate value for English text
         }
 
@@ -205,5 +207,7 @@ namespace Microsoft.AzureDataEngineering.AI
         public static int NUMBER_OF_CHARS_PER_TOKEN { get; private set; } 
         public static int RUN_PROCESS_MAX_RETRIES { get; private set; }
         public static int RUN_PROCESS_TIMEOUT_INTERVAL_SECS { get; private set; }
+        public static int MAX_NUMBER_OF_CODEGEN_RETRIES { get; private set; }
+        
     }
 }

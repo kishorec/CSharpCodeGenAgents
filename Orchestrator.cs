@@ -9,7 +9,6 @@ namespace Microsoft.AzureDataEngineering.AI
         static readonly string DesignDocHtmlFile = Path.Combine(ProjectDir, "DesignDocument.html");
         static readonly string CsProjDir = Path.Combine(ProjectDir, "CSProject");
         static readonly string TestProjDir = Path.Combine(ProjectDir, "TestProject");
-        static readonly int MaxRetries = 10;
 
         static async Task Main() => await RunOrchestratorAsync();
 
@@ -53,9 +52,10 @@ namespace Microsoft.AzureDataEngineering.AI
             Console.WriteLine("\nStarting code generation...");
             string code = await GenCodeAgent.GenerateAsync(taskDescription);
 
-            for (int attempt = 1; attempt <= MaxRetries; attempt++)
+            int maxRetries = AgentConfiguration.MAX_NUMBER_OF_CODEGEN_RETRIES;
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
             {
-                Console.WriteLine($"\nAttempt {attempt} of {MaxRetries} — Validating generated code...");
+                Console.WriteLine($"\nAttempt {attempt} of {maxRetries} — Validating generated code...");
 
                 try
                 {
