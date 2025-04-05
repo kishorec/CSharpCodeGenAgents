@@ -75,6 +75,7 @@ namespace Microsoft.AzureDataEngineering.AI
                         continue;
                     }
 
+                    Console.WriteLine("Build succeeded!");
                     Console.WriteLine("\nRunning tests...");
                     var (testSuccess, testErrors) = await RunTestsAsync(TestProjDir);
                     if (!testSuccess)
@@ -205,7 +206,9 @@ namespace Microsoft.AzureDataEngineering.AI
         {
             Console.WriteLine("\nWelcome to the AI Code Generation Agent!");
             Console.WriteLine("========================================");
-            Console.WriteLine("\nI’m an intelligent C# code generation agent—designed to write, test, and document clean code for your requests.\n");
+            Console.WriteLine($"Azure Open AI Configuration:");
+            Console.WriteLine($"Endpoint={AgentConfiguration.AZURE_OPENAI_ENDPOINT}, Model Deployment={AgentConfiguration.AZURE_OPENAI_DEPLOYMENT}, Version={AgentConfiguration.AZURE_OPENAI_API_VERSION}");
+            Console.WriteLine("\nI’m an intelligent C# code generation agent - designed to write, test, and document clean code for your requests.\n");
         }
 
     }

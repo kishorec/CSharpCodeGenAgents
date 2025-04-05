@@ -35,7 +35,11 @@ namespace Microsoft.AzureDataEngineering.AI
 
             var body = new
             {
-                messages = new[] { new { role = "user", content = prompt } },
+                messages = new[] 
+                {
+                    new { role = "system", content = "You are a helpful assistant." },
+                    new { role = "user", content = prompt }
+                },
                 max_completion_tokens = maxCompletionTokens,
                 model = deployment
             };
