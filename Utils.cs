@@ -144,13 +144,13 @@ namespace Microsoft.AzureDataEngineering.AI
 
             int totalLength = code.Length + errors.Length + task.Length;
 
-            if (totalLength <= maxPromptTokens)
+            if (totalLength <= maxNumberOfChars)
             {
                 // No trimming needed
                 return;
             }
 
-            int excess = totalLength - maxPromptTokens;
+            int excess = totalLength - maxNumberOfChars;
 
             if (errors.Length > excess)
             {
