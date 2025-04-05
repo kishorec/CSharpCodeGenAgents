@@ -2,7 +2,7 @@
 {
     class FixCodeAgent
     {
-        public static async Task<string> GenerateAsync(string code, string errors)
+        public static async Task<string> GenerateAsync(string code, string errors, string task)
         {
             Console.WriteLine("'FixCode' agent is building the prompt for the task...");
 
@@ -14,6 +14,9 @@
 
                 Here is the compiler/test error output:
                 {errors}
+
+                Here is the task that you have to solve using the code and errors provided above:
+                {task}
 
                 Objective:
                 Fix the code so that it compiles successfully and passes **all unit tests**.

@@ -61,7 +61,7 @@ namespace Microsoft.AzureDataEngineering.AI
                         {
                             Console.WriteLine("Build failed. Attempting to fix...");
                             Console.WriteLine(buildErrors);
-                            code = await FixCodeAgent.GenerateAsync(code, buildErrors);
+                            code = await FixCodeAgent.GenerateAsync(code, buildErrors, taskDescription);
                             await Task.Delay(200);
                             continue;
                         }
@@ -88,7 +88,7 @@ namespace Microsoft.AzureDataEngineering.AI
                             {
                                 Console.WriteLine("Tests failed. Attempting to fix...");
                                 Console.WriteLine(testErrors);
-                                code = await FixCodeAgent.GenerateAsync(code, testErrors);
+                                code = await FixCodeAgent.GenerateAsync(code, testErrors, taskDescription);
                                 await Task.Delay(200);
                                 continue;
                             }
@@ -96,7 +96,7 @@ namespace Microsoft.AzureDataEngineering.AI
                         catch (TimeoutException e)
                         {
                             Console.WriteLine("Tests timed out. Attempting to fix...");
-                            code = await FixCodeAgent.GenerateAsync(code, "Tests did not run because they were hung and timed out. Exception:" + e.Message);
+                            code = await FixCodeAgent.GenerateAsync(code, "Tests did not run because they were hung and timed out. Exception:" + e.Message, taskDescription);
                             await Task.Delay(200);
                             continue;
                         }
