@@ -4,6 +4,11 @@
     {
         public static async Task<string> GenerateAsync(string code)
         {
+            if (code == null)
+            {
+                throw new ArgumentNullException("Code cannot be null.");
+            }
+            
             Console.WriteLine("'DocumentGen' agent is building the prompt for the task...");
             string prompt = $@"
                 You are a senior software architect. Based on the C# code below, write a **professional design document** in clear, well-structured **Markdown** format.
@@ -43,7 +48,7 @@
                 - No extra explanations outside the document
                 ";
 
-            return await AzureOpenAI.AskAzureAsync(prompt);
+            return await AzureOpenAI.AskAsync(prompt);
         }
     }
 }

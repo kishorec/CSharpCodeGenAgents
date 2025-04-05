@@ -1,10 +1,18 @@
-﻿namespace Microsoft.AzureDataEngineering.AI
+﻿using System.Configuration;
+
+namespace Microsoft.AzureDataEngineering.AI
 {
     class FixCodeAgent
     {
         public static async Task<string> GenerateAsync(string code, string errors, string task)
         {
+            if (code == null || errors == null || task == null)
+            {
+                throw new ArgumentNullException("Code, errors, and task cannot be null.");
+            }
+
             Console.WriteLine("'FixCode' agent is building the prompt for the task...");
+            Utils.TrimErrorsIfNeeded(ref code, ref errors, ref task);
 
             string prompt = $@"
                 You are an expert C# software engineer and bug fixer. The following C# code has failed to build or pass unit tests.
@@ -51,7 +59,7 @@
                 - Output pseudocode, logs, or placeholders
                 ";
 
-            return await AzureOpenAI.AskAzureAsync(prompt);
+            return await AzureOpenAI.AskAsync(prompt);
         }
     }
 }

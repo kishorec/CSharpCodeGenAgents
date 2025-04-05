@@ -11,16 +11,26 @@ namespace Microsoft.AzureDataEngineering.AI
 {
     public class AzureOpenAI
     {
-        public static async Task<string> AskAzureAsync(string prompt)
+        public static async Task<string> AskAsync(string prompt)
         {
+            if (prompt == null)
+            {
+                throw new ArgumentNullException("Prompt cannot be null");
+            }
+
+            prompt = prompt.Trim();
+            Console.WriteLine($"Prompt Size:{prompt.Length} chars");
             Console.WriteLine("Asking Azure OpenAI...");
             var stopwatch = Stopwatch.StartNew();
-            string endpoint = ConfigurationManager.AppSettings["AZURE_OPENAI_ENDPOINT"] ?? string.Empty;
-            string key = ConfigurationManager.AppSettings["AZURE_OPENAI_KEY"] ?? string.Empty;
-            string deployment = ConfigurationManager.AppSettings["AZURE_OPENAI_DEPLOYMENT"] ?? string.Empty;
-            string apiVersion = ConfigurationManager.AppSettings["AZURE_OPENAI_API_VERSION"] ?? "2024-12-01-preview";
-            int maxRetries = Int32.Parse(ConfigurationManager.AppSettings["AZURE_OPENAI_CALL_MAX_RETRIES"] ?? "0");
-            int delayMilliseconds = Int32.Parse(ConfigurationManager.AppSettings["AZURE_OPENAI_CALL_WAIT_INTERVAL_SECS"] ?? "1000");
+
+            string endpoint = AgentConfiguration.AZURE_OPENAI_ENDPOINT;
+            string key = AgentConfiguration.AZURE_OPENAI_KEY;
+            string deployment = AgentConfiguration.AZURE_OPENAI_DEPLOYMENT;
+            string apiVersion = AgentConfiguration.AZURE_OPENAI_API_VERSION;
+            int maxCompletionTokens = AgentConfiguration.AZURE_OPENAI_MAX_COMPLETION_TOKENS;
+            int maxRetries = AgentConfiguration.AZURE_OPENAI_CALL_MAX_RETRIES;
+            int delayMilliseconds = AgentConfiguration.AZURE_OPENAI_CALL_WAIT_INTERVAL_SECS;
+            int maxNumberOfTokens = AgentConfiguration.AZURE_OPENAI_MAX_NUMBER_OF_TOKENS;
 
             using var client = new HttpClient();
             client.BaseAddress = new Uri(endpoint);
@@ -29,9 +39,7 @@ namespace Microsoft.AzureDataEngineering.AI
             var body = new
             {
                 messages = new[] { new { role = "user", content = prompt } },
-                
-                //max_tokens = 10000, //Works for GPT4
-                max_completion_tokens = 10000,
+                max_completion_tokens = maxCompletionTokens,
                 model = deployment
             };
 
@@ -39,8 +47,6 @@ namespace Microsoft.AzureDataEngineering.AI
             string jsonPayload = JsonSerializer.Serialize(body);
 
             HttpResponseMessage response = null;
-
-            // Only retry the POST call if an exception occurs.
             for (int attempt = 1; attempt <= maxRetries; attempt++)
             {
                 try
@@ -65,7 +71,6 @@ namespace Microsoft.AzureDataEngineering.AI
                 }
             }
 
-            // Process the response outside the retry loop.
             string json = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
@@ -113,14 +118,21 @@ namespace Microsoft.AzureDataEngineering.AI
         /// <returns></returns>
         public static async Task<string> AskAzureSdkAsync(string prompt)
         {
-            Console.WriteLine("Asking Azure OpenAI...");
-            //Console.WriteLine("Prompt:");
-            //Console.WriteLine(prompt);
+            if (prompt == null)
+            {
+                throw new ArgumentNullException("Prompt cannot be null");
+            }
 
-            string endpoint = ConfigurationManager.AppSettings["AZURE_OPENAI_ENDPOINT"] ?? String.Empty;
-            string key = ConfigurationManager.AppSettings["AZURE_OPENAI_KEY"] ?? String.Empty;
-            string deployment = ConfigurationManager.AppSettings["AZURE_OPENAI_DEPLOYMENT"] ?? String.Empty;
-            string apiVersion = ConfigurationManager.AppSettings["AZURE_OPENAI_API_VERSION"] ?? "2024-12-01-preview";
+            prompt = prompt.Trim();
+            Console.WriteLine($"Prompt Size:{prompt.Length} chars");
+            Console.WriteLine("Asking Azure OpenAI...");
+            var stopwatch = Stopwatch.StartNew();
+
+            string endpoint = AgentConfiguration.AZURE_OPENAI_ENDPOINT;
+            string key = AgentConfiguration.AZURE_OPENAI_KEY;
+            string deployment = AgentConfiguration.AZURE_OPENAI_DEPLOYMENT;
+            string apiVersion = AgentConfiguration.AZURE_OPENAI_API_VERSION;
+            int maxCompletionTokens = AgentConfiguration.AZURE_OPENAI_MAX_COMPLETION_TOKENS;
 
             AzureOpenAIClientOptions clientOptions = new AzureOpenAIClientOptions(ServiceVersion.V2024_10_21);
 
@@ -129,7 +141,7 @@ namespace Microsoft.AzureDataEngineering.AI
             var chatOptions = new ChatCompletionOptions()
             {
                 Temperature = 0.5f,
-                MaxOutputTokenCount = 10000,
+                MaxOutputTokenCount = maxCompletionTokens,
             };
 
             ChatClient chatClient = azureClient.GetChatClient(deployment);
@@ -141,7 +153,10 @@ namespace Microsoft.AzureDataEngineering.AI
                 ],
                 chatOptions);
 
-            return completion.Content[0].Text.Trim();
+            string response = completion.Content[0].Text.Trim();
+            stopwatch.Stop();
+            Console.WriteLine($"Time taken by Azure OpenAI: {stopwatch.ElapsedMilliseconds} ms");
+            return response;
         }
     }
 }

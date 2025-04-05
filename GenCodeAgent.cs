@@ -1,9 +1,16 @@
-﻿namespace Microsoft.AzureDataEngineering.AI
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace Microsoft.AzureDataEngineering.AI
 {
     class GenCodeAgent
     {
         public static async Task<string> GenerateAsync(string task)
         {
+            if (task == null)
+            {
+                throw new ArgumentNullException("Task description cannot be null.");
+            }
+
             Console.WriteLine("'CodeGen' agent is building the prompt for the task...");
             string prompt = $@"
                 You are an expert C# software engineer writing production-quality code.
@@ -39,7 +46,7 @@
                 Output:
                 - Only valid, fully compilable C# code following the above requirements
                 ";
-            return await AzureOpenAI.AskAzureAsync(prompt);
+            return await AzureOpenAI.AskAsync(prompt);
         }
     }
 }

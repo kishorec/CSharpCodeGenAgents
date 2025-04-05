@@ -120,7 +120,7 @@ namespace Microsoft.AzureDataEngineering.AI
         {
             Directory.CreateDirectory(ProjectDir);
 
-            string appType = ConfigurationManager.AppSettings["APP_TYPE"] ?? "console";
+            string appType = AgentConfiguration.APP_TYPE;
             Console.WriteLine("System is configured to create Project for App type: " + appType);
             if (appType.Equals("winforms", StringComparison.OrdinalIgnoreCase))
             {

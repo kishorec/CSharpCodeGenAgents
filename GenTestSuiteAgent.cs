@@ -4,6 +4,11 @@
     {
         public static async Task<string> GenerateAsync(string code)
         {
+            if (code == null)
+            {
+                throw new ArgumentNullException("Code cannot be null.");
+            }
+
             Console.WriteLine("'TestSuiteGen' agent is building the prompt for the task...");
             string prompt = $@"
                 You are an expert C# developer and test engineer. Your task is to write comprehensive NUnit unit tests for the following C# class and method:
@@ -38,7 +43,7 @@
                 Output:
                 - One complete C# file containing only NUnit tests following the rules above
                 ";
-            return await AzureOpenAI.AskAzureAsync(prompt);
+            return await AzureOpenAI.AskAsync(prompt);
         }
     }
 }
