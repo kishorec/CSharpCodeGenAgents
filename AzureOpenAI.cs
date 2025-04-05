@@ -13,10 +13,7 @@ namespace Microsoft.AzureDataEngineering.AI
     {
         public static async Task<string> AskAsync(string prompt)
         {
-            if (prompt == null)
-            {
-                throw new ArgumentNullException("Prompt cannot be null");
-            }
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(prompt);
 
             prompt = prompt.Trim();
             Console.WriteLine($"Prompt Size:{prompt.Length} chars");
@@ -67,6 +64,7 @@ namespace Microsoft.AzureDataEngineering.AI
                     {
                         throw; // Re-throw the exception if max retries reached.
                     }
+                    Console.WriteLine($"Trying again...");
                     await Task.Delay(delayMilliseconds);
                 }
             }

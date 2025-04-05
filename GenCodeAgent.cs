@@ -6,10 +6,7 @@ namespace Microsoft.AzureDataEngineering.AI
     {
         public static async Task<string> GenerateAsync(string task)
         {
-            if (task == null)
-            {
-                throw new ArgumentNullException("Task description cannot be null.");
-            }
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(task);
 
             Console.WriteLine("'CodeGen' agent is building the prompt for the task...");
             string prompt = $@"

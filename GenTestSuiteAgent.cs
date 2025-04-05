@@ -4,10 +4,7 @@
     {
         public static async Task<string> GenerateAsync(string code)
         {
-            if (code == null)
-            {
-                throw new ArgumentNullException("Code cannot be null.");
-            }
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
 
             Console.WriteLine("'TestSuiteGen' agent is building the prompt for the task...");
             string prompt = $@"

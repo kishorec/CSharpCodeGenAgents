@@ -6,10 +6,9 @@ namespace Microsoft.AzureDataEngineering.AI
     {
         public static async Task<string> GenerateAsync(string code, string errors, string task)
         {
-            if (code == null || errors == null || task == null)
-            {
-                throw new ArgumentNullException("Code, errors, and task cannot be null.");
-            }
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(errors);
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(task);
 
             Console.WriteLine("'FixCode' agent is building the prompt for the task...");
             Utils.TrimErrorsIfNeeded(ref code, ref errors, ref task);

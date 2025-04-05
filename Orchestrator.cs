@@ -14,9 +14,9 @@ namespace Microsoft.AzureDataEngineering.AI
 
         static async Task RunOrchestratorAsync()
         {
-            CleanupProjects();
+            await CleanupProjectsAsync();
 
-            Console.WriteLine("\nI’m an intelligent C# code generation agent—designed to write, test, and document clean code for your requests.\n");
+            PrintWelcomeBanner();
 
             while (true)
             {
@@ -24,17 +24,14 @@ namespace Microsoft.AzureDataEngineering.AI
                 string taskDescription = Console.ReadLine()?.Trim() ?? string.Empty;
 
                 if (string.IsNullOrWhiteSpace(taskDescription))
-                {
                     continue;
-                }
+
                 if (taskDescription.Equals("exit", StringComparison.OrdinalIgnoreCase))
-                {
                     break;
-                }
 
                 try
                 {
-                    SetupProjects();
+                    await SetupVisualStudioProjectsAsync();
                     if (!await TryGenerateAndTestCodeAsync(taskDescription))
                     {
                         Console.WriteLine($"\nMaximum retries reached. Unable to complete: {taskDescription}");
@@ -44,6 +41,8 @@ namespace Microsoft.AzureDataEngineering.AI
                 {
                     Console.WriteLine($"\nException: {ex.Message}\nFailed to complete: {taskDescription}");
                 }
+
+                Console.WriteLine();
             }
         }
 
@@ -62,37 +61,42 @@ namespace Microsoft.AzureDataEngineering.AI
                     Console.WriteLine("\nStarting test suite generation...");
                     string tests = await GenTestSuiteAgent.GenerateAsync(code);
 
-                    File.WriteAllText(Path.Combine(CsProjDir, "Solution.cs"), code);
-                    File.WriteAllText(Path.Combine(TestProjDir, "Tests.cs"), tests);
+                    await File.WriteAllTextAsync(Path.Combine(CsProjDir, "Solution.cs"), code);
+                    await File.WriteAllTextAsync(Path.Combine(TestProjDir, "Tests.cs"), tests);
 
-                    Console.WriteLine("Building the solution...");
-                    if (!BuildProject(CsProjDir, out var buildErrors))
+                    Console.WriteLine("\nBuilding the solution...");
+                    var (buildSuccess, buildErrors) = await BuildProjectAsync(CsProjDir);
+                    if (!buildSuccess)
                     {
-                        Console.WriteLine("Build failed. Attempting fix...\n" + buildErrors);
-                        code = await FixCodeAgent.GenerateAsync(code, buildErrors, taskDescription);
+                        Console.WriteLine("Build failed. Attempting fix...");
+                        Console.WriteLine(buildErrors);
+                        code = await FixCodeAgent.GenerateAsync(code, "Build errors", taskDescription);
                         await Task.Delay(200);
                         continue;
                     }
 
-                    Console.WriteLine("Running tests...");
-                    if (RunTests(TestProjDir, out var testErrors))
+                    Console.WriteLine("\nRunning tests...");
+                    var (testSuccess, testErrors) = await RunTestsAsync(TestProjDir);
+                    if (!testSuccess)
                     {
-                        Console.WriteLine("All tests passed! Generating design document...");
-                        await GenerateDesignDocAsync(code);
-                        Console.WriteLine($"Task completed: {taskDescription}");
-                        return true;
+                        Console.WriteLine("Tests failed. Attempting fix...");
+                        Console.WriteLine(testErrors);
+                        code = await FixCodeAgent.GenerateAsync(code, "Test failures", taskDescription);
+                        await Task.Delay(200);
+                        continue;
                     }
                     else
                     {
-                        Console.WriteLine("Tests failed. Attempting fix...\n" + testErrors);
-                        code = await FixCodeAgent.GenerateAsync(code, testErrors, taskDescription);
-                        await Task.Delay(200);
-                        continue;
+                        Console.WriteLine("All tests passed!");
+                        Console.WriteLine("\nGenerating design document...");
+                        await GenerateDesignDocAsync(code);
+                        Console.WriteLine($"\nTask completed: {taskDescription}");
+                        return true;
                     }
                 }
                 catch (TimeoutException ex)
                 {
-                    Console.WriteLine("Tests timed out. Attempting fix...");
+                    Console.WriteLine($"Tests timed out. Attempting fix...\n{ex.Message}");
                     code = await FixCodeAgent.GenerateAsync(code, $"Tests timed out: {ex.Message}", taskDescription);
                     await Task.Delay(200);
                     continue;
@@ -109,67 +113,67 @@ namespace Microsoft.AzureDataEngineering.AI
         static async Task GenerateDesignDocAsync(string code)
         {
             string designDoc = await GenDocAgent.GenerateAsync(code);
-            File.WriteAllText(DesignDocFile, designDoc);
-            File.WriteAllText(DesignDocHtmlFile, MarkdownToHtml(designDoc));
+            await File.WriteAllTextAsync(DesignDocFile, designDoc);
+            await File.WriteAllTextAsync(DesignDocHtmlFile, MarkdownToHtml(designDoc));
             Console.WriteLine($"Design document saved: {DesignDocHtmlFile}");
         }
-        static string MarkdownToHtml(string md) =>
-        $"<html><head><meta charset='utf-8'><title>Design Doc</title></head><body><pre>{md}</pre></body></html>";
 
-        static void SetupProjects()
+        static string MarkdownToHtml(string md) =>
+            $"<html><head><meta charset='utf-8'><title>Design Doc</title></head><body><pre>{md}</pre></body></html>";
+
+        static async Task SetupVisualStudioProjectsAsync()
         {
+            Console.WriteLine();
             Directory.CreateDirectory(ProjectDir);
 
             string appType = AgentConfiguration.APP_TYPE.ToLower();
-            Console.WriteLine($"Setting up project for app type: {appType}");
+            Console.WriteLine($"Setting up Visual Studio project for app type: {appType}");
 
-            switch (appType)
+            if (appType == "winforms")
             {
-                case "winforms":
-                    Utils.Run("dotnet", $"new winforms -o {CsProjDir}");
-                    CreateTestProject();
-                    FixWinFormsTestProject();
-                    break;
-
-                case "web":
-                    Utils.Run("dotnet", $"new web -o {CsProjDir}");
-                    CreateTestProject();
-                    break;
-
-                default:
-                    Utils.Run("dotnet", $"new console -o {CsProjDir}");
-                    CreateTestProject();
-                    break;
+                await Utils.RunAsync("dotnet", $"new winforms -o {CsProjDir}");
+                await CreateTestProjectAsync();
+                await FixWinFormsTestProjectAsync();
+            }
+            else if (appType == "web")
+            {
+                await Utils.RunAsync("dotnet", $"new web -o {CsProjDir}");
+                await CreateTestProjectAsync();
+            }
+            else
+            {
+                await Utils.RunAsync("dotnet", $"new console -o {CsProjDir}");
+                await CreateTestProjectAsync();
             }
 
-            Utils.RunIn(TestProjDir, "dotnet add reference ../CSProject/CSProject.csproj");
-            Utils.RunIn(ProjectDir, "dotnet new sln -n AIProjects");
-            Utils.RunIn(ProjectDir, "dotnet sln add CSProject/CSProject.csproj");
-            Utils.RunIn(ProjectDir, "dotnet sln add TestProject/TestProject.csproj");
+            await Utils.RunInAsync(TestProjDir, "dotnet add reference ../CSProject/CSProject.csproj");
+            await Utils.RunInAsync(ProjectDir, "dotnet new sln -n AIProjects");
+            await Utils.RunInAsync(ProjectDir, "dotnet sln add CSProject/CSProject.csproj");
+            await Utils.RunInAsync(ProjectDir, "dotnet sln add TestProject/TestProject.csproj");
         }
 
-        static void CreateTestProject()
+        static async Task CreateTestProjectAsync()
         {
-            Utils.Run("dotnet", $"new nunit -o {TestProjDir}");
+            await Utils.RunAsync("dotnet", $"new nunit -o {TestProjDir}");
         }
 
-        static void FixWinFormsTestProject()
+        static async Task FixWinFormsTestProjectAsync()
         {
             string testProjPath = Path.Combine(TestProjDir, "TestProject.csproj");
 
             if (File.Exists(testProjPath))
             {
-                string csprojContent = File.ReadAllText(testProjPath);
+                string csprojContent = await File.ReadAllTextAsync(testProjPath);
                 if (csprojContent.Contains("<TargetFramework>net8.0</TargetFramework>") && !csprojContent.Contains("-windows"))
                 {
                     csprojContent = csprojContent.Replace("<TargetFramework>net8.0</TargetFramework>",
                         "<TargetFramework>net8.0-windows</TargetFramework>\n  <UseWindowsForms>true</UseWindowsForms>");
-                    File.WriteAllText(testProjPath, csprojContent);
+                    await File.WriteAllTextAsync(testProjPath, csprojContent);
                 }
             }
         }
 
-        static void CleanupProjects()
+        static async Task CleanupProjectsAsync()
         {
             if (Directory.Exists(ProjectDir))
             {
@@ -177,24 +181,30 @@ namespace Microsoft.AzureDataEngineering.AI
                 {
                     Directory.Delete(ProjectDir, true);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Warning: Failed to delete output directory.");
+                    Console.WriteLine($"Warning: Failed to delete output directory. {ex.Message}");
                 }
             }
+            await Task.CompletedTask;
         }
 
-        static bool BuildProject(string projectDir, out string errors) => RunCommand(projectDir, "dotnet build", out errors);
-
-        static bool RunTests(string testProjDir, out string errors) => RunCommand(testProjDir, "dotnet test", out errors);
-
-        static bool RunCommand(string dir, string command, out string output)
+        static async Task<(bool success, string output)> BuildProjectAsync(string projectDir)
         {
-            output = string.Empty;
-            var process = Utils.RunIn(dir, command, out var errorMessage, out var outputMessage);
-
-            output = errorMessage?.ToString() ?? outputMessage?.ToString() ?? string.Empty;
-            return process.ExitCode == 0;
+            return await Utils.RunCommandAsync(projectDir, "dotnet build");
         }
+
+        static async Task<(bool success, string output)> RunTestsAsync(string testProjDir)
+        {
+            return await Utils.RunCommandAsync(testProjDir, "dotnet test");
+        }
+
+        private static void PrintWelcomeBanner()
+        {
+            Console.WriteLine("\nWelcome to the AI Code Generation Agent!");
+            Console.WriteLine("========================================");
+            Console.WriteLine("\nI’m an intelligent C# code generation agent—designed to write, test, and document clean code for your requests.\n");
+        }
+
     }
 }
