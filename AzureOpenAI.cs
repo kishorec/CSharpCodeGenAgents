@@ -16,7 +16,7 @@ namespace Microsoft.AzureDataEngineering.AI
             ArgumentNullException.ThrowIfNullOrWhiteSpace(prompt);
 
             prompt = prompt.Trim();
-            Console.WriteLine($"Prompt Size:{prompt.Length} chars");
+            Console.WriteLine($"Request Size:{prompt.Length} chars");
             Console.WriteLine("Asking Azure OpenAI...");
             var stopwatch = Stopwatch.StartNew();
 
@@ -73,6 +73,7 @@ namespace Microsoft.AzureDataEngineering.AI
                 }
             }
 
+            Debug.Assert(response != null, "Response should not be null after retries.");
             string json = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
@@ -120,10 +121,7 @@ namespace Microsoft.AzureDataEngineering.AI
         /// <returns></returns>
         public static async Task<string> AskAzureSdkAsync(string prompt)
         {
-            if (prompt == null)
-            {
-                throw new ArgumentNullException("Prompt cannot be null");
-            }
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(prompt);
 
             prompt = prompt.Trim();
             Console.WriteLine($"Prompt Size:{prompt.Length} chars");

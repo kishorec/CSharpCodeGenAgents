@@ -8,7 +8,7 @@ namespace Microsoft.AzureDataEngineering.AI
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(task);
 
-            Console.WriteLine("'CodeGen' agent is building the prompt for the task...");
+            Console.WriteLine("'CodeGen' agent is building the request for the task...");
             string prompt = $@"
                 You are an expert C# software engineer writing production-quality code.
 

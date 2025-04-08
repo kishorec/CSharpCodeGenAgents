@@ -10,7 +10,7 @@ namespace Microsoft.AzureDataEngineering.AI
             ArgumentNullException.ThrowIfNullOrWhiteSpace(errors);
             ArgumentNullException.ThrowIfNullOrWhiteSpace(task);
 
-            Console.WriteLine("'FixCode' agent is building the prompt for the task...");
+            Console.WriteLine("'FixCode' agent is building the request for the task...");
             Utils.TrimErrorsIfNeeded(ref code, ref errors, ref task);
 
             string prompt = $@"

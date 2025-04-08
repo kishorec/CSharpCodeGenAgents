@@ -159,6 +159,22 @@ Implement ADO.NET driver for windows file system
 Write an asp.net service that proides apis for scientific calculator
 
 ============ For Demos ============
+Binary Search Tree:
+Write a binary search tree inorder preorder and postorder traversal without recursion and also implement topogical sort
+
+Hashjoin implementation (Simple prompt):
+Implment a hashjoin for all types of database joins
+
+Hashjoin implementation (Detailed prompt):
+Implement a high-performance, scalable Hash Join algorithm that supports large datasets, multi-threading, and all standard SQL join types (INNER JOIN, LEFT OUTER JOIN, RIGHT OUTER JOIN, FULL OUTER JOIN, and SEMI JOIN). The algorithm should work in two main phases: a build phase and a probe phase. In the build phase, construct a hash table from the smaller relation based on the join key(s). In the probe phase, scan the other relation and probe the hash table for matching rows. The implementation should be multi-threaded where possible, allowing concurrent partitioning, hashing, and probing to improve performance on large datasets. The algorithm must correctly handle one-to-one, one-to-many, and many-to-many relationships. It should support multiple join keys (composite keys) and allow for optional key projection and row projection. The output should be consistent with SQL semantics for each join type, including producing NULLs appropriately for outer joins where matches are missing.
+
+T-SQL Parser:
+Build a modular T-SQL parser (tokenizer + parser + AST builder) that supports only ANSI-standard SELECT statements (with WHERE, GROUP BY, HAVING, ORDER BY, JOINs, subqueries, etc.). No INSERT/UPDATE/DDL.
+
+Lease renewal system for artifacts:
+Implement a lease management system for artifacts that ensures efficient and reliable lease renewals. Each artifact should have a lease renewal timestamp indicating when the lease must next be renewed, as well as a record of the last renewal epoch. All artifacts should be stored in a priority queue, ordered by the nearest upcoming lease renewal time. When new artifacts are added, they must be dynamically inserted into the priority queue in the correct order based on their lease renewal timestamp. In the background, a separate thread or process must run continuously to monitor the artifacts and handle the renewal of leases. The renewal logic should ensure that artifacts are only renewed when they are close to expiration — not too early to avoid excessive, unnecessary calls to the underlying storage system, and not too late to prevent the loss of artifacts and potential disruption to consumers accessing them. Upon successful renewal, the artifact’s last renewed epoch and next renewal timestamp should be updated appropriately. The background process should operate efficiently, ideally waking up and processing renewals only when necessary, based on the timing of upcoming expirations, rather than polling constantly. The system must be capable of handling artifacts being added, removed, or updated at runtime, maintaining the correct ordering in the priority queue at all times. The overall goal is to balance the timing of lease renewals intelligently to maximize efficiency and reliability.
+
+============= More ================
 Write a scientific calculator class
 Quick Sort – Fast divide-and-conquer sorting algorithm with average-case O(n log n).
 Dijkstra’s Algorithm – Finds the shortest path in a graph with non-negative weights.
@@ -168,15 +184,3 @@ Write a cache implemenation that uses most recently used policy for evictions
 Shortest Path in Weighted Graphs – Dijkstra, A*, Bellman-Ford.
 K-Means Clustering – Partitions data into k clusters based on feature similarity.
 
-
-Binary Search Tree:
-Write a binary search tree inorder preorder and postorder traversal without recursion and also implement topogical sort
-
-T-SQL Parser:
-Build a modular T-SQL parser (tokenizer + parser + AST builder) that supports only ANSI-standard SELECT statements (with WHERE, GROUP BY, HAVING, ORDER BY, JOINs, subqueries, etc.). No INSERT/UPDATE/DDL.
-
-Hashjoin implementation:
-Implement a high-performance, scalable Hash Join algorithm that supports large datasets, multi-threading, and all standard SQL join types (INNER JOIN, LEFT OUTER JOIN, RIGHT OUTER JOIN, FULL OUTER JOIN, and SEMI JOIN). The algorithm should work in two main phases: a build phase and a probe phase. In the build phase, construct a hash table from the smaller relation based on the join key(s). In the probe phase, scan the other relation and probe the hash table for matching rows. The implementation should be multi-threaded where possible, allowing concurrent partitioning, hashing, and probing to improve performance on large datasets. The algorithm must correctly handle one-to-one, one-to-many, and many-to-many relationships. It should support multiple join keys (composite keys) and allow for optional key projection and row projection. The output should be consistent with SQL semantics for each join type, including producing NULLs appropriately for outer joins where matches are missing.
-
-Lease renewal system for artifacts:
-Implement a lease management system for artifacts that ensures efficient and reliable lease renewals. Each artifact should have a lease renewal timestamp indicating when the lease must next be renewed, as well as a record of the last renewal epoch. All artifacts should be stored in a priority queue, ordered by the nearest upcoming lease renewal time. When new artifacts are added, they must be dynamically inserted into the priority queue in the correct order based on their lease renewal timestamp. In the background, a separate thread or process must run continuously to monitor the artifacts and handle the renewal of leases. The renewal logic should ensure that artifacts are only renewed when they are close to expiration — not too early to avoid excessive, unnecessary calls to the underlying storage system, and not too late to prevent the loss of artifacts and potential disruption to consumers accessing them. Upon successful renewal, the artifact’s last renewed epoch and next renewal timestamp should be updated appropriately. The background process should operate efficiently, ideally waking up and processing renewals only when necessary, based on the timing of upcoming expirations, rather than polling constantly. The system must be capable of handling artifacts being added, removed, or updated at runtime, maintaining the correct ordering in the priority queue at all times. The overall goal is to balance the timing of lease renewals intelligently to maximize efficiency and reliability.

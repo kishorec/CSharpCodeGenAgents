@@ -6,7 +6,7 @@
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
 
-            Console.WriteLine("'TestSuiteGen' agent is building the prompt for the task...");
+            Console.WriteLine("'TestSuiteGen' agent is building the request for the task...");
             string prompt = $@"
                 You are an expert C# developer and test engineer. Your task is to write comprehensive NUnit unit tests for the following C# class and method:
 

@@ -6,7 +6,7 @@
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(code);
 
-            Console.WriteLine("'DocumentGen' agent is building the prompt for the task...");
+            Console.WriteLine("'DocumentGen' agent is building the request for the task...");
             string prompt = $@"
                 You are a senior software architect. Based on the C# code below, write a **professional design document** in clear, well-structured **Markdown** format.
 
