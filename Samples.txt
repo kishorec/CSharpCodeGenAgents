@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-============ Well Known Computer Science Problems --- ============
-=======
 ============ Well Known Computer Science Problems - Test ============
->>>>>>> 0426727e6ae0210b85d76865e42e6667b9d0414a
+--
 Sorting & Searching:
 Quick Sort – Fast divide-and-conquer sorting algorithm with average-case O(n log n).
 Merge Sort – Stable, recursive sort that always runs in O(n log n).
