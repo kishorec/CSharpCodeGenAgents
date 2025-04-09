@@ -1,4 +1,4 @@
-============ Well Known Computer Science Problems ============
+============ Well Known Computer Science Problems --- ============
 Sorting & Searching:
 Quick Sort – Fast divide-and-conquer sorting algorithm with average-case O(n log n).
 Merge Sort – Stable, recursive sort that always runs in O(n log n).
