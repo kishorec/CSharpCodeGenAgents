@@ -13,7 +13,9 @@ namespace Microsoft.AzureDataEngineering.AI
                 You are an expert C# software engineer writing production-quality code.
 
                 Your task is to solve the following problem:
+                ```plaintext
                 {task}
+                ```
 
                 Requirements:
                 - Write clean, correct, and idiomatic C# code targeting .NET 6 or higher
